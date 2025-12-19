@@ -4,7 +4,6 @@
       <div class="flex justify-between items-center mb-8">
         <div>
           <h1 class="text-3xl font-bold">Редактирование поста</h1>
-          <p class="mt-2 text-gray-600" v-if="post">Текущий slug: <code class="bg-gray-100 px-2 py-1 rounded">{{ slug }}</code></p>
         </div>
         <button
           @click="handleDelete"
