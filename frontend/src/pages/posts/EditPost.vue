@@ -1,110 +1,76 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="max-w-2xl mx-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Редактирование поста</h1>
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-bold">Редактирование поста</h1>
+          <p class="mt-2 text-gray-600" v-if="post">Текущий slug: <code class="bg-gray-100 px-2 py-1 rounded">{{ slug }}</code></p>
+        </div>
         <button
           @click="handleDelete"
-          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+          class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition-colors flex items-center"
         >
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
           Удалить пост
         </button>
       </div>
 
       <!-- Состояния загрузки -->
-      <div v-if="isPostLoading || isCategoriesLoading" class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        <p class="mt-2 text-gray-600">Загрузка данных...</p>
+      <div v-if="isLoading" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <p class="mt-4 text-gray-600">Загрузка данных...</p>
       </div>
 
-      <!-- Форма редактирования -->
-      <form v-else @submit.prevent="handleSubmit" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium mb-1">Название поста *</label>
-          <input
-            v-model="form.name"
-            type="text"
-            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            required
-            :disabled="isPending"
-          />
+      <!-- Ошибка загрузки -->
+      <div v-else-if="isPostError" class="bg-red-50 border-l-4 border-red-500 p-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-medium text-red-800">Пост не найден</h3>
+            <div class="mt-2 text-red-700">
+              <p>Пост с slug "{{ slug }}" не существует.</p>
+            </div>
+            <div class="mt-4">
+              <router-link
+                to="/posts"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Вернуться к списку постов
+              </router-link>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Категория *</label>
-          <select
-            v-model="form.category_id"
-            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            required
-            :disabled="isPending"
-          >
-            <option value="">Выберите категорию</option>
-            <option
-              v-for="category in categories"
-              :key="category.id"
-              :value="category.id"
-            >
-              {{ category.name }} (ID: {{ category.id }})
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium mb-1">Содержание *</label>
-          <textarea
-            v-model="form.content"
-            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 h-40"
-            required
-            :disabled="isPending"
-          ></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium mb-1">URL изображения</label>
-          <input
-            v-model="form.image_url"
-            type="url"
-            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            placeholder="https://example.com/image.jpg"
-            :disabled="isPending"
-          />
-          <p class="text-sm text-gray-500 mt-1">
-            Текущее изображение:
-            <img v-if="form.image_url" :src="form.image_url" class="w-32 h-32 object-cover mt-2 rounded" />
-          </p>
-        </div>
-
-        <div class="flex space-x-2 pt-4">
-          <button
-            type="submit"
-            :disabled="isPending"
-            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors disabled:opacity-50"
-          >
-            {{ isPending ? 'Сохранение...' : 'Сохранить изменения' }}
-          </button>
-
-          <router-link
-            to="/posts"
-            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded transition-colors"
-          >
-            Отмена
-          </router-link>
-        </div>
-
-        <div v-if="submitError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Ошибка: {{ submitError }}
-        </div>
-      </form>
+      <!-- Форма -->
+      <PostForm
+        v-else
+        :initial-data="form"
+        :categories="categories"
+        :is-loading-categories="isCategoriesLoading"
+        :is-submitting="isSubmitting"
+        :submit-error="submitError"
+        submit-button-text="Сохранить изменения"
+        mode="edit"
+        @submit="handleSubmit"
+        @cancel="handleCancel"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
 import { postsApi } from '@/api/posts'
-import { categoriesApi } from '@/api/categories'
-import { ref, watch } from 'vue'
+import { usePostForm } from '@/composables/usePostForm'
+import PostForm from '@/components/forms/PostForm.vue'
 
 const props = defineProps({
   slug: {
@@ -115,60 +81,48 @@ const props = defineProps({
 
 const router = useRouter()
 const queryClient = useQueryClient()
-const submitError = ref('')
 
-const form = ref({
-  name: '',
-  content: '',
-  image_url: '',
-  category_id: ''
-})
+// Используем композейбл с передачей slug
+const {
+  form,
+  categories,
+  post,
+  isCategoriesLoading,
+  isPostError,
+  isLoading,
+  isSubmitting: formIsSubmitting,
+  submitError,
+  handleCancel
+} = usePostForm(props.slug)
 
-// Загрузка поста через useQuery (ТРЕБОВАНИЕ)
-const { data: post, isLoading: isPostLoading } = useQuery({
-  queryKey: ['post', props.slug],
-  queryFn: () => postsApi.getPost(props.slug).then(res => res.data),
-  enabled: !!props.slug
-})
-
-// Загрузка категорий
-const { data: categories, isLoading: isCategoriesLoading } = useQuery({
-  queryKey: ['categories'],
-  queryFn: () => categoriesApi.getCategories().then(res => res.data)
-})
-
-// Наполняем форму при загрузке данных
-watch(post, (newPost) => {
-  if (newPost) {
-    form.value = {
-      name: newPost.name,
-      content: newPost.content,
-      image_url: newPost.image_url || '',
-      category_id: newPost.category_id
-    }
-  }
-})
-
-// Обновление поста через useMutation (ТРЕБОВАНИЕ)
-const { mutate: updatePost, isPending } = useMutation({
+// Мутация для обновления поста
+const { mutate: updatePost } = useMutation({
   mutationFn: (data) => postsApi.updatePost(props.slug, data),
+  onMutate: () => {
+    formIsSubmitting.value = true
+  },
   onSuccess: () => {
-    // Refetch после обновления (ТРЕБОВАНИЕ)
+    // Refetch после обновления
     queryClient.invalidateQueries({ queryKey: ['post', props.slug] })
     queryClient.invalidateQueries({ queryKey: ['posts'] })
     submitError.value = ''
-    alert('Пост успешно обновлен!')
+
+    // Можно добавить уведомление об успехе
+    console.log('Пост успешно обновлен!')
   },
   onError: (error) => {
     submitError.value = error.response?.data?.detail || 'Ошибка обновления поста'
+  },
+  onSettled: () => {
+    formIsSubmitting.value = false
   }
 })
 
-// Удаление поста через useMutation (ТРЕБОВАНИЕ)
+// Мутация для удаления поста
 const { mutate: deletePostMutation } = useMutation({
   mutationFn: () => postsApi.deletePost(props.slug),
   onSuccess: () => {
-    // После удаления - переход на список постов (ТРЕБОВАНИЕ)
+    // После удаления - переход на список постов
     queryClient.invalidateQueries({ queryKey: ['posts'] })
     router.push('/posts')
   },
@@ -177,24 +131,8 @@ const { mutate: deletePostMutation } = useMutation({
   }
 })
 
-const handleSubmit = () => {
-  submitError.value = ''
-
-  // Валидация
-  if (!form.value.name.trim()) {
-    submitError.value = 'Введите название поста'
-    return
-  }
-  if (!form.value.content.trim()) {
-    submitError.value = 'Введите содержание поста'
-    return
-  }
-  if (!form.value.category_id) {
-    submitError.value = 'Выберите категорию'
-    return
-  }
-
-  updatePost(form.value)
+const handleSubmit = (formData) => {
+  updatePost(formData)
 }
 
 const handleDelete = () => {

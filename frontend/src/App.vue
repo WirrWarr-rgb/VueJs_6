@@ -30,15 +30,6 @@
                 Категории
               </router-link>
             </div>
-
-            <!-- Переключатель темы -->
-            <button
-              @click="toggleDarkMode"
-              class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            >
-              <span v-if="isDarkMode" class="text-yellow-300">☀️</span>
-              <span v-else class="text-gray-700">🌙</span>
-            </button>
           </div>
         </div>
       </nav>
@@ -56,10 +47,6 @@ import { ref, watch, onMounted } from 'vue'
 
 // const route = useRoute()
 const isDarkMode = ref(false)
-
-const toggleDarkMode = () => {
-  isDarkMode.value = !isDarkMode.value
-}
 
 watch(isDarkMode, (newValue) => {
   if (newValue) {

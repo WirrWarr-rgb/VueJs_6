@@ -1,34 +1,59 @@
 <template>
   <div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <thead class="bg-gray-50 dark:bg-gray-800">
         <tr>
           <th
             v-for="column in columns"
             :key="column.key"
-            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
           >
             {{ column.label }}
           </th>
         </tr>
       </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        <tr v-for="(row, rowIndex) in data" :key="rowIndex">
+      <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+        <tr
+          v-for="(row, rowIndex) in data"
+          :key="rowIndex"
+          class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
           <td
             v-for="column in columns"
             :key="column.key"
-            class="px-6 py-4 whitespace-nowrap"
+            class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100"
           >
             <!-- Слот для кастомного отображения -->
             <slot :name="column.key" :value="row[column.key]" :row="row">
               <!-- Значение по умолчанию -->
-              {{ row[column.key] }}
+              <span class="text-gray-900 dark:text-gray-100">
+                {{ row[column.key] }}
+              </span>
             </slot>
           </td>
         </tr>
         <tr v-if="data.length === 0">
-          <td :colspan="columns.length" class="px-6 py-4 text-center text-gray-500">
-            Нет данных
+          <td
+            :colspan="columns.length"
+            class="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+          >
+            <div class="flex flex-col items-center justify-center">
+              <svg
+                class="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <p class="text-lg font-medium">Нет данных</p>
+              <p class="text-sm mt-1">Создайте первую запись</p>
+            </div>
           </td>
         </tr>
       </tbody>

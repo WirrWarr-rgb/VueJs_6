@@ -14,6 +14,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@headlessui/vue": "^1.7.23",
     "@regle/core": "^1.14.4",
     "@regle/rules": "^1.14.4",
     "@tanstack/vue-query": "^5.92.1",
