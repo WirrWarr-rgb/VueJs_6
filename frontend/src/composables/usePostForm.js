@@ -16,7 +16,7 @@ export function usePostForm(slug = null) {
   const submitError = ref('')
   const isSubmitting = ref(false)
 
-  // Загрузка категорий
+  // загрузка категорий
   const {
     data: categories,
     isLoading: isCategoriesLoading
@@ -26,7 +26,7 @@ export function usePostForm(slug = null) {
     staleTime: 1000 * 60
   })
 
-  // Загрузка поста (только для редактирования)
+  // загрузка поста (только для редактирования)
   const {
     data: post,
     isLoading: isPostLoading,
@@ -34,13 +34,12 @@ export function usePostForm(slug = null) {
   } = useQuery({
     queryKey: ['post', slug],
     queryFn: () => postsApi.getPost(slug).then(res => {
-      console.log('Post data loaded:', res.data) // Логирование
       return res.data
     }),
-    enabled: !!slug, // Только если передан slug
+    enabled: !!slug,
     staleTime: 1000 * 60,
     onSuccess: (data) => {
-      // Наполняем форму сразу при успешной загрузке
+      // наполняем форму сразу при успешной загрузке
       if (data) {
         form.value = {
           name: data.name || '',
@@ -48,12 +47,11 @@ export function usePostForm(slug = null) {
           image_url: data.image_url || '',
           category_id: data.category_id || ''
         }
-        console.log('Form filled with data:', form.value) // Логирование
       }
     }
   })
 
-  // Дублируем watch для надежности
+  // дублируем watch для надежности
   watch(post, (newPost) => {
     if (newPost) {
       form.value = {
@@ -62,13 +60,12 @@ export function usePostForm(slug = null) {
         image_url: newPost.image_url || '',
         category_id: newPost.category_id || ''
       }
-      console.log('Watch triggered, form updated:', form.value)
     }
   }, { immediate: true })
 
   const isLoading = computed(() => isPostLoading.value || isCategoriesLoading.value)
 
-  // Функция для сброса формы
+  // функция для сброса формы
   const resetForm = () => {
     form.value = {
       name: '',
@@ -79,7 +76,7 @@ export function usePostForm(slug = null) {
     submitError.value = ''
   }
 
-  // Функция для отмены
+  // функция для отмены
   const handleCancel = () => {
     router.push('/posts')
   }

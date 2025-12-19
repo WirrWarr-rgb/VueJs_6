@@ -6,13 +6,13 @@
         <p class="mt-2 text-gray-600 dark:text-gray-400">Заполните форму ниже, чтобы создать новый пост</p>
       </div>
 
-      <!-- Состояние загрузки категорий -->
+      <!-- состояние загрузки категорий -->
       <div v-if="isCategoriesLoading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 dark:border-blue-400"></div>
         <p class="mt-4 text-gray-600 dark:text-gray-400">Загрузка категорий...</p>
       </div>
 
-      <!-- Форма -->
+      <!-- форма -->
       <PostForm
         v-else
         :initial-data="form"
@@ -26,7 +26,7 @@
         @cancel="handleCancel"
       />
 
-      <!-- Уведомление об успешном создании -->
+      <!-- уведомление об успешном создании -->
       <Transition
         enter-active-class="transition ease-out duration-300"
         enter-from-class="transform opacity-0 translate-y-2"
@@ -81,7 +81,7 @@ import PostForm from '@/components/forms/PostForm.vue'
 const router = useRouter()
 const queryClient = useQueryClient()
 
-// Используем композейбл
+// используем композейбл
 const {
   form,
   categories,
@@ -89,11 +89,11 @@ const {
   isSubmitting: formIsSubmitting,
   submitError,
   handleCancel: formHandleCancel
-} = usePostForm() // ← Убрали resetForm
+} = usePostForm()
 
 const showSuccessNotification = ref(false)
 
-// Мутация для создания поста
+// мутация для создания поста
 const { mutate: createPost } = useMutation({
   mutationFn: (data) => postsApi.createPost(data),
   onMutate: () => {
@@ -101,13 +101,13 @@ const { mutate: createPost } = useMutation({
     submitError.value = ''
   },
   onSuccess: () => {
-    // Показываем уведомление об успехе
+    // показываем уведомление об успехе
     showSuccessNotification.value = true
 
-    // Инвалидируем кэш постов
+    // инвалидируем кэш постов
     queryClient.invalidateQueries({ queryKey: ['posts'] })
 
-    // Через 1.5 секунды переходим к списку постов
+    // через 1,5 секунды переходим к списку постов
     setTimeout(() => {
       router.push('/posts')
     }, 1500)

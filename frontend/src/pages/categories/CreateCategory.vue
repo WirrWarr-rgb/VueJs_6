@@ -54,11 +54,11 @@ const form = ref({
   name: ''
 })
 
-// Создание категории через useMutation (ТРЕБОВАНИЕ)
+// создание категории через useMutation
 const { mutate: createCategory, isPending } = useMutation({
   mutationFn: (data) => categoriesApi.createCategory(data),
   onSuccess: () => {
-    // Инвалидация кэша (ТРЕБОВАНИЕ)
+    // инвалидация кэша
     queryClient.invalidateQueries({ queryKey: ['categories'] })
     router.push('/categories')
   },

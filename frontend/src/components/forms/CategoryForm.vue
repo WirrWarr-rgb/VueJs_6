@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <!-- Общие ошибки -->
+    <!-- общие ошибки -->
     <div v-if="submitError"
       :class="[
         'border-l-4 p-4',
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <!-- Кнопки -->
+    <!-- кнопки -->
     <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
       <div class="text-sm text-gray-500 dark:text-gray-400">
         <span v-if="isSubmitting" class="flex items-center">
@@ -100,7 +100,7 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  // Данные формы
+  // данные формы
   initialData: {
     type: Object,
     default: () => ({
@@ -108,19 +108,19 @@ const props = defineProps({
     })
   },
 
-  // Состояния
+  // состояния
   isSubmitting: {
     type: Boolean,
     default: false
   },
 
-  // Ошибки
+  // ошибки
   submitError: {
     type: String,
     default: ''
   },
 
-  // Текст кнопки
+  // текст кнопки
   submitButtonText: {
     type: String,
     default: 'Сохранить'
@@ -132,12 +132,12 @@ const emit = defineEmits(['submit', 'cancel'])
 const form = ref({ ...props.initialData })
 const errorField = ref('')
 
-// Наблюдаем за изменениями initialData
+// наблюдаем за изменениями initialData
 watch(() => props.initialData, (newData) => {
   form.value = { ...newData }
 }, { deep: true })
 
-// Валидация формы
+// валидация формы
 const validateForm = () => {
   errorField.value = ''
 
@@ -149,14 +149,14 @@ const validateForm = () => {
   return true
 }
 
-// Обработка отправки формы
+// обработка отправки формы
 const handleSubmit = () => {
   if (validateForm()) {
     emit('submit', form.value)
   }
 }
 
-// Обработка отмены
+// обработка отмены
 const handleCancel = () => {
   emit('cancel')
 }

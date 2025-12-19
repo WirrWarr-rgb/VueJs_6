@@ -92,14 +92,8 @@
         ]"
         placeholder="https://example.com/image.jpg"
       />
-      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-        Подсказка: можно использовать
-        <code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-300">
-          https://picsum.photos/600/400
-        </code>
-      </p>
 
-      <!-- Предпросмотр изображения -->
+      <!-- предпросмотр изображения -->
       <div v-if="form.image_url" class="mt-4">
         <p class="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">Предпросмотр:</p>
         <img
@@ -111,7 +105,7 @@
       </div>
     </div>
 
-    <!-- Общие ошибки -->
+    <!-- общие ошибки -->
     <div v-if="submitError"
       :class="[
         'border-l-4 p-4',
@@ -130,7 +124,7 @@
       </div>
     </div>
 
-    <!-- Кнопки -->
+    <!-- кнопки -->
     <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
       <div class="text-sm text-gray-500 dark:text-gray-400">
         <span v-if="isSubmitting" class="flex items-center">
@@ -187,7 +181,7 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  // Данные формы
+  // данные формы
   initialData: {
     type: Object,
     default: () => ({
@@ -198,13 +192,13 @@ const props = defineProps({
     })
   },
 
-  // Категории для select
+  // категории для select
   categories: {
     type: Array,
     default: () => []
   },
 
-  // Состояния загрузки
+  // состояния загрузки
   isLoadingCategories: {
     type: Boolean,
     default: false
@@ -218,19 +212,19 @@ const props = defineProps({
     default: false
   },
 
-  // Ошибки
+  // ошибки
   submitError: {
     type: String,
     default: ''
   },
 
-  // Текст кнопки отправки
+  // текст кнопки отправки
   submitButtonText: {
     type: String,
     default: 'Сохранить'
   },
 
-  // Режим (create/edit)
+  // режим (create/edit)
   mode: {
     type: String,
     default: 'create',
@@ -247,12 +241,12 @@ const errorFields = ref({
   category_id: ''
 })
 
-// Наблюдаем за изменениями initialData
+// наблюдаем за изменениями initialData
 watch(() => props.initialData, (newData) => {
   form.value = { ...newData }
 }, { deep: true })
 
-// Валидация формы
+// валидация формы
 const validateForm = () => {
   let isValid = true
   errorFields.value = { name: '', content: '', category_id: '' }
@@ -275,19 +269,19 @@ const validateForm = () => {
   return isValid
 }
 
-// Обработка отправки формы
+// обработка отправки формы
 const handleSubmit = () => {
   if (validateForm()) {
     emit('submit', form.value)
   }
 }
 
-// Обработка отмены
+// обработка отмены
 const handleCancel = () => {
   emit('cancel')
 }
 
-// Обработка ошибки загрузки изображения
+// обработка ошибки загрузки изображения
 const handleImageError = (event) => {
   event.target.src = 'https://via.placeholder.com/600x400?text=Изображение+не+загружено'
 }

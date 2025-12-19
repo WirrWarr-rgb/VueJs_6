@@ -43,9 +43,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-// import { useRoute } from 'vue-router'
 
-// const route = useRoute()
 const isDarkMode = ref(false)
 
 watch(isDarkMode, (newValue) => {

@@ -7,7 +7,7 @@ const router = createRouter({
       path: '/',
       redirect: '/posts'
     },
-    // Посты
+    // посты
     {
       path: '/posts',
       name: 'posts',
@@ -24,7 +24,7 @@ const router = createRouter({
       component: () => import('@/pages/posts/EditPost.vue'),
       props: true
     },
-    // Категории
+    // категории
     {
       path: '/categories',
       name: 'categories',

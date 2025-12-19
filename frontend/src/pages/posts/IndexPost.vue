@@ -21,7 +21,7 @@
       </router-link>
     </div>
 
-    <!-- Поиск с debounce -->
+    <!-- поиск с debounce -->
     <div class="mb-6 max-w-md">
       <div class="relative">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -44,14 +44,14 @@
       </p>
     </div>
 
-    <!-- Таблица постов -->
+    <!-- таблица постов -->
     <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       <DataTable
         v-if="!isLoading"
         :columns="columns"
         :data="postsWithCategories"
       >
-        <!-- Слот для изображения -->
+        <!-- слот для изображения -->
         <template #image_url="{ value }">
           <div class="flex justify-center">
             <img
@@ -68,7 +68,7 @@
           </div>
         </template>
 
-        <!-- Слот для названия с RouterLink -->
+        <!-- слот для названия с RouterLink -->
         <template #name="{ row }">
           <div>
             <router-link
@@ -83,7 +83,7 @@
           </div>
         </template>
 
-        <!-- Слот для категории -->
+        <!-- слот для категории -->
         <template #category="{ row }">
           <div class="flex items-center">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
@@ -93,7 +93,7 @@
           </div>
         </template>
 
-        <!-- Слот для действий -->
+        <!-- слот для действий -->
         <template #actions="{ row }">
           <div class="flex space-x-2">
             <router-link
@@ -114,7 +114,7 @@
         </template>
       </DataTable>
 
-      <!-- Состояния загрузки -->
+      <!-- состояния загрузки -->
       <div v-if="isLoading" class="py-12 text-center">
         <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 dark:border-blue-500"></div>
         <p class="mt-4 text-gray-600 dark:text-gray-400">
@@ -177,26 +177,26 @@ import DataTable from '@/components/ui/DataTable.vue'
 const searchQuery = ref('')
 const searchInput = ref('')
 
-// Debounce поиска
+// debounce поиска
 const handleSearch = useDebounceFn(() => {
   searchQuery.value = searchInput.value.trim()
 }, 500)
 
-// Получение постов
+// получение постов
 const { data: posts, isLoading, error } = useQuery({
   queryKey: ['posts', searchQuery],
   queryFn: () => postsApi.getPosts(searchQuery.value).then(res => res.data),
   staleTime: 1000 * 60
 })
 
-// Получение категорий
+// получение категорий
 const { data: categories } = useQuery({
   queryKey: ['categories'],
   queryFn: () => categoriesApi.getCategories().then(res => res.data),
   staleTime: 1000 * 60
 })
 
-// Объединяем посты с названиями категорий
+// объединяем посты с названиями категорий
 const postsWithCategories = computed(() => {
   if (!posts.value || !categories.value) return []
 
@@ -206,14 +206,14 @@ const postsWithCategories = computed(() => {
   }))
 })
 
-// Функция для получения названия категории
+// функция для получения названия категории
 const getCategoryName = (categoryId) => {
   if (!categories.value) return `Категория #${categoryId}`
   const category = categories.value.find(c => c.id === categoryId)
   return category ? category.name : `Категория #${categoryId}`
 }
 
-// Функция для получения цвета категории
+// функция для получения цвета категории
 const getCategoryColor = (categoryId) => {
   const colors = [
     'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
@@ -228,7 +228,7 @@ const getCategoryColor = (categoryId) => {
   return colors[index] || colors[0]
 }
 
-// Функция для обрезки контента
+// функция для обрезки контента
 const truncateContent = (text, maxLength) => {
   if (text.length <= maxLength) return text
   return text.substring(0, maxLength) + '...'
@@ -236,7 +236,7 @@ const truncateContent = (text, maxLength) => {
 
 const queryClient = useQueryClient()
 
-// Удаление поста
+// удаление поста
 const { mutate: deletePost } = useMutation({
   mutationFn: (slug) => postsApi.deletePost(slug),
   onSuccess: () => {

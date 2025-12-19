@@ -16,13 +16,13 @@
         </button>
       </div>
 
-      <!-- Состояния загрузки -->
+      <!-- состояния загрузки -->
       <div v-if="isLoading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         <p class="mt-4 text-gray-600">Загрузка данных...</p>
       </div>
 
-      <!-- Ошибка загрузки -->
+      <!-- ошибка загрузки -->
       <div v-else-if="isPostError" class="bg-red-50 border-l-4 border-red-500 p-6">
         <div class="flex">
           <div class="flex-shrink-0">
@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <!-- Форма -->
+      <!-- форма -->
       <PostForm
         v-else
         :initial-data="form"
@@ -81,11 +81,10 @@ const props = defineProps({
 const router = useRouter()
 const queryClient = useQueryClient()
 
-// Используем композейбл с передачей slug
+// используем композейбл с передачей slug
 const {
   form,
   categories,
-  post,
   isCategoriesLoading,
   isPostError,
   isLoading,
@@ -94,34 +93,85 @@ const {
   handleCancel
 } = usePostForm(props.slug)
 
-// Мутация для обновления поста
+// мутация для обновления поста - ИСПРАВЛЕННАЯ ВЕРСИЯ
 const { mutate: updatePost } = useMutation({
   mutationFn: (data) => postsApi.updatePost(props.slug, data),
   onMutate: () => {
     formIsSubmitting.value = true
-  },
-  onSuccess: () => {
-    // Refetch после обновления
-    queryClient.invalidateQueries({ queryKey: ['post', props.slug] })
-    queryClient.invalidateQueries({ queryKey: ['posts'] })
     submitError.value = ''
+  },
+  onSuccess: (response) => {
+    try {
+      // Получаем обновленный пост из ответа
+      const updatedPost = response.data
 
-    // Можно добавить уведомление об успехе
-    console.log('Пост успешно обновлен!')
+      if (!updatedPost || !updatedPost.slug) {
+        throw new Error('Неверный формат ответа от сервера')
+      }
+
+      const newSlug = updatedPost.slug
+      const oldSlug = props.slug
+
+      console.log(`Пост обновлен! Старый slug: ${oldSlug}, новый slug: ${newSlug}`)
+
+      // Удаляем кэш со старым slug
+      queryClient.removeQueries({ queryKey: ['post', oldSlug] })
+
+      // Инвалидируем кэш постов
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+
+      // Если slug изменился, обновляем URL
+      if (newSlug !== oldSlug) {
+        console.log(`Slug изменился с "${oldSlug}" на "${newSlug}", обновляем URL...`)
+
+        // Небольшая задержка для корректного обновления
+        setTimeout(() => {
+          router.replace({
+            name: 'post-edit',
+            params: { slug: newSlug }
+          })
+        }, 100)
+      }
+
+      showSuccessNotification('Пост успешно обновлен!')
+
+    } catch (error) {
+      console.error('Ошибка обработки ответа:', error)
+      // В случае ошибки все равно инвалидируем кэш
+      queryClient.invalidateQueries({ queryKey: ['post', props.slug] })
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+    }
   },
   onError: (error) => {
-    submitError.value = error.response?.data?.detail || 'Ошибка обновления поста'
+    console.error('Ошибка обновления поста:', error)
+
+    if (error.response) {
+      if (error.response.status === 404) {
+        submitError.value = 'Пост не найден. Возможно, он был удален.'
+      } else if (error.response.status === 400) {
+        submitError.value = error.response.data?.detail || 'Некорректные данные'
+      } else {
+        submitError.value = error.response.data?.detail || 'Ошибка обновления поста'
+      }
+    } else if (error.request) {
+      submitError.value = 'Нет ответа от сервера. Проверьте подключение.'
+    } else {
+      submitError.value = 'Неизвестная ошибка'
+    }
   },
   onSettled: () => {
     formIsSubmitting.value = false
   }
 })
 
-// Мутация для удаления поста
+const showSuccessNotification = (message) => {
+  console.log(message)
+}
+
+// мутация для удаления поста
 const { mutate: deletePostMutation } = useMutation({
   mutationFn: () => postsApi.deletePost(props.slug),
   onSuccess: () => {
-    // После удаления - переход на список постов
     queryClient.invalidateQueries({ queryKey: ['posts'] })
     router.push('/posts')
   },

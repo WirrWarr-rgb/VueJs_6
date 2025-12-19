@@ -10,13 +10,13 @@
       </router-link>
     </div>
 
-    <!-- Таблица категорий -->
+    <!-- таблица категорий -->
     <DataTable
       v-if="!isLoading"
       :columns="columns"
       :data="categories"
     >
-      <!-- Слот для кнопки удаления (ТРЕБОВАНИЕ задания) -->
+      <!-- слот для кнопки удаления -->
       <template #actions="{ row }">
         <div class="flex space-x-2">
           <router-link
@@ -35,7 +35,7 @@
       </template>
     </DataTable>
 
-    <!-- Состояния загрузки -->
+    <!-- состояния загрузки -->
     <div v-if="isLoading" class="text-center py-8">
       <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       <p class="mt-2 text-gray-600">Загрузка категорий...</p>
@@ -51,22 +51,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { categoriesApi } from '@/api/categories'
 import DataTable from '@/components/ui/DataTable.vue'
-// import { ref } from 'vue'
 
 const queryClient = useQueryClient()
 
-// Загрузка категорий через useQuery (ТРЕБОВАНИЕ)
+// загрузка категорий через useQuery
 const { data: categories, isLoading, error } = useQuery({
   queryKey: ['categories'],
   queryFn: () => categoriesApi.getCategories().then(res => res.data),
   staleTime: 1000 * 60 // 1 минута кэша
 })
 
-// Удаление категории через useMutation (ТРЕБОВАНИЕ)
+// удаление категории через useMutation
 const { mutate: deleteCategory } = useMutation({
   mutationFn: (id) => categoriesApi.deleteCategory(id),
   onSuccess: () => {
-    // Инвалидация кэша (ТРЕБОВАНИЕ)
+    // инвалидация кэша
     queryClient.invalidateQueries({ queryKey: ['categories'] })
   },
   onError: (error) => {

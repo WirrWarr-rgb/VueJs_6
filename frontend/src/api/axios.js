@@ -1,3 +1,5 @@
+// базовый клиент axios для взаимодействия с backend API
+
 import axios from 'axios'
 
 const apiClient = axios.create({

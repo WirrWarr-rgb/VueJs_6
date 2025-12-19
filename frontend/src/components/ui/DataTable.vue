@@ -23,9 +23,9 @@
             :key="column.key"
             class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100"
           >
-            <!-- Слот для кастомного отображения -->
+            <!-- слот для кастомного отображения -->
             <slot :name="column.key" :value="row[column.key]" :row="row">
-              <!-- Значение по умолчанию -->
+              <!-- значение по умолчанию -->
               <span class="text-gray-900 dark:text-gray-100">
                 {{ row[column.key] }}
               </span>

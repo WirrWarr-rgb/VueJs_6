@@ -1,3 +1,5 @@
+// все CRUD операции для постов (и поиск)
+
 import apiClient from './axios'
 
 export const postsApi = {

@@ -1,3 +1,5 @@
+// все CRUD-операции для категорий
+
 import apiClient from './axios'
 
 export const categoriesApi = {
